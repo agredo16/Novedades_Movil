@@ -1,0 +1,40 @@
+name: novedades_movil
+description: "Gestión de trámites académicos"
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # State Management
+  flutter_riverpod: ^2.5.1
+
+  # Navegación
+  go_router: ^13.2.0
+
+  # HTTP
+  dio: ^5.4.3
+
+  # Storage
+  shared_preferences: ^2.2.3
+  flutter_secure_storage: ^9.0.0
+
+  # UI
+  flutter_svg: ^2.0.10
+  file_picker: ^8.0.3
+
+  # Utilidades
+  intl: ^0.19.0
+  equatable: ^2.0.5
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.0
+
+flutter:
+  uses-material-design: true
