@@ -32,7 +32,6 @@ class SolicitudItemCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Ícono
           Container(
             width: 36, height: 36,
             decoration: BoxDecoration(
@@ -62,7 +61,6 @@ class SolicitudItemCard extends StatelessWidget {
             ),
           ),
 
-          // Tiempo y flecha
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [

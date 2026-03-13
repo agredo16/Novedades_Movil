@@ -1,21 +1,23 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:novedades_movil/features/shared/resultado_solicitud_dialog.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
+import '../../../providers/auth_provider.dart';
 
-class LoginScreen extends StatefulWidget {
+class LoginScreen extends ConsumerStatefulWidget {
   const LoginScreen({super.key});
 
   @override
-  State<LoginScreen> createState() => _LoginScreenState();
+  ConsumerState<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen> {
-  final _codigoController = TextEditingController();
-  final _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-  bool _isLoading = false;
+class _LoginScreenState extends ConsumerState<LoginScreen> {
+  final _codigoController    = TextEditingController();
+  final _passwordController  = TextEditingController();
+  bool _obscurePassword      = true;
 
   @override
   void dispose() {
@@ -24,33 +26,46 @@ class _LoginScreenState extends State<LoginScreen> {
     super.dispose();
   }
 
-  void _handleLogin() async {
-  // Validación básica
+ Future<void> _handleLogin() async {
   if (_codigoController.text.isEmpty || _passwordController.text.isEmpty) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: const Text('Por favor completa todos los campos'),
-        backgroundColor: AppColors.error,
-        behavior: SnackBarBehavior.floating,
-        shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8)),
-        margin: const EdgeInsets.all(16),
+    showDialog(
+      context: context,
+      builder: (_) => ErrorSolicitudDialog(
+        mensaje: 'Por favor completa el código estudiantil y la contraseña.',
+        onIntentar: () => Navigator.pop(context),
+        onCancelar: () => Navigator.pop(context),
       ),
     );
     return;
   }
 
-  setState(() => _isLoading = true);
-  await Future.delayed(const Duration(milliseconds: 1200));
+  await ref.read(authProvider.notifier).login(
+    codigo:   _codigoController.text.trim(),
+    password: _passwordController.text.trim(),
+  );
 
-  if (mounted) {
-    setState(() => _isLoading = false);
+  if (!mounted) return;
+
+  final authState = ref.read(authProvider);
+
+  if (authState.isAuthenticated && authState.user != null) {
     context.go('/home');
+  } else if (authState.error != null) {
+    showDialog(
+      context: context,
+      builder: (_) => ErrorSolicitudDialog(
+        mensaje: authState.error!,
+        onIntentar: () => Navigator.pop(context),
+        onCancelar: () => Navigator.pop(context),
+      ),
+    );
   }
 }
 
   @override
   Widget build(BuildContext context) {
+    final isLoading = ref.watch(authProvider).isLoading;
+
     return Scaffold(
       backgroundColor: AppColors.bgPage,
       body: SafeArea(
@@ -60,24 +75,17 @@ class _LoginScreenState extends State<LoginScreen> {
             children: [
               const SizedBox(height: AppSpacing.s12),
 
-              // ── Ícono superior ──────────────────────────
               Container(
-                width: 80,
-                height: 80,
+                width: 80, height: 80,
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                 ),
-                child: const Icon(
-                  Icons.school_rounded,
-                  color: AppColors.white,
-                  size: 40,
-                ),
+                child: const Icon(Icons.school_rounded,
+                    color: AppColors.white, size: 40),
               ),
 
               const SizedBox(height: AppSpacing.s6),
-
-              // ── Título ──────────────────────────────────
               Text('Bienvenido, Estudiante', style: AppTypography.xl2),
               const SizedBox(height: AppSpacing.s2),
               Text(
@@ -88,7 +96,6 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: AppSpacing.s8),
 
-              // ── Card del formulario ─────────────────────
               Container(
                 padding: const EdgeInsets.all(AppSpacing.s5),
                 decoration: BoxDecoration(
@@ -105,15 +112,12 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-
-                    // ── Campo Código ──────────────────────
                     Text('CÓDIGO ESTUDIANTIL',
-                      style: AppTypography.xs.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.gray500,
-                      ),
-                    ),
+                        style: AppTypography.xs.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.gray500,
+                        )),
                     const SizedBox(height: AppSpacing.s2),
                     TextField(
                       controller: _codigoController,
@@ -126,17 +130,13 @@ class _LoginScreenState extends State<LoginScreen> {
                             color: AppColors.gray400),
                       ),
                     ),
-
                     const SizedBox(height: AppSpacing.s4),
-
-                    // ── Campo Contraseña ──────────────────
                     Text('CONTRASEÑA',
-                      style: AppTypography.xs.copyWith(
-                        fontWeight: FontWeight.w700,
-                        letterSpacing: 0.8,
-                        color: AppColors.gray500,
-                      ),
-                    ),
+                        style: AppTypography.xs.copyWith(
+                          fontWeight: FontWeight.w700,
+                          letterSpacing: 0.8,
+                          color: AppColors.gray500,
+                        )),
                     const SizedBox(height: AppSpacing.s2),
                     TextField(
                       controller: _passwordController,
@@ -159,14 +159,12 @@ class _LoginScreenState extends State<LoginScreen> {
                         ),
                       ),
                     ),
-
-                    // ── ¿Olvidaste tu código? ─────────────
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
                         onPressed: () {},
                         child: Text('¿Olvidaste tu código?',
-                          style: AppTypography.smPrimary),
+                            style: AppTypography.smPrimary),
                       ),
                     ),
                   ],
@@ -175,23 +173,22 @@ class _LoginScreenState extends State<LoginScreen> {
 
               const SizedBox(height: AppSpacing.s5),
 
-              // ── Botón Iniciar Sesión ────────────────────
               SizedBox(
                 width: double.infinity,
                 height: 52,
                 child: ElevatedButton(
-                  onPressed: _isLoading ? null : _handleLogin,
-                  child: _isLoading
+                  onPressed: isLoading ? null : _handleLogin,
+                  child: isLoading
                       ? const SizedBox(
                           width: 22, height: 22,
                           child: CircularProgressIndicator(
-                            color: AppColors.white, strokeWidth: 2),
+                              color: AppColors.white, strokeWidth: 2),
                         )
                       : Row(
                           mainAxisAlignment: MainAxisAlignment.center,
                           children: [
                             Text('Iniciar Sesión',
-                              style: AppTypography.lgWhite),
+                                style: AppTypography.lgWhite),
                             const SizedBox(width: AppSpacing.s2),
                             const Icon(Icons.arrow_forward,
                                 color: AppColors.white),
@@ -201,8 +198,6 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
 
               const SizedBox(height: AppSpacing.s6),
-
-              // ── Acceso Seguro SSL ───────────────────────
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -210,48 +205,10 @@ class _LoginScreenState extends State<LoginScreen> {
                       size: 14, color: AppColors.gray400),
                   const SizedBox(width: AppSpacing.s1),
                   Text('ACCESO SEGURO SSL',
-                    style: AppTypography.xs.copyWith(
-                      color: AppColors.gray400, letterSpacing: 0.8)),
-                ],
-              ),
-
-              const SizedBox(height: AppSpacing.s4),
-
-              // ── Footer ─────────────────────────────────
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  const Icon(Icons.help_outline,
-                      size: 14, color: AppColors.gray400),
-                  const SizedBox(width: AppSpacing.s1),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero),
-                    child: Text('Centro de Ayuda',
-                        style: AppTypography.xs.copyWith(
-                            color: AppColors.gray500)),
-                  ),
-                  Text(' • ',
                       style: AppTypography.xs.copyWith(
-                          color: AppColors.gray400)),
-                  TextButton(
-                    onPressed: () {},
-                    style: TextButton.styleFrom(
-                        minimumSize: Size.zero,
-                        padding: EdgeInsets.zero),
-                    child: Text('Términos de Uso',
-                        style: AppTypography.xs.copyWith(
-                            color: AppColors.gray500)),
-                  ),
+                          color: AppColors.gray400, letterSpacing: 0.8)),
                 ],
               ),
-
-              const SizedBox(height: AppSpacing.s2),
-              Text('© 2024 AcademiaMóvil v2.4.0',
-                style: AppTypography.xs.copyWith(color: AppColors.gray400)),
-
               const SizedBox(height: AppSpacing.s6),
             ],
           ),

@@ -1,14 +1,22 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../data/models/solicitud_model.dart';
+import 'auth_provider.dart';
 
-// Stats
+final nombreUsuarioProvider = Provider<String>((ref) {
+  final authState = ref.watch(authProvider);
+  if (authState.user != null) {
+    final nombreCompleto = authState.user!.nombreCompleto;
+    return nombreCompleto.split(' ').first;
+  }
+  return 'Estudiante';
+});
+
 final statsProvider = Provider<Map<String, int>>((ref) => {
   'enProceso': 3,
   'aprobadas': 12,
   'rechazadas': 1,
 });
 
-// Solicitudes recientes
 final solicitudesRecientesProvider = Provider<List<SolicitudModel>>((ref) => [
   const SolicitudModel(
     id: '1',

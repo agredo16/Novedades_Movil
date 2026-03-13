@@ -111,7 +111,6 @@ class _NotificacionesScreenState extends ConsumerState<NotificacionesScreen>
       padding: const EdgeInsets.all(AppSpacing.s4),
       itemCount: lista.length,
       itemBuilder: (context, index) {
-        // Separador "Anteriores"
         final mostrarSeparador = index > 0 &&
             !lista[index - 1].leida && lista[index].leida;
 

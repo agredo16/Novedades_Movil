@@ -58,7 +58,6 @@ class NotificacionCard extends StatelessWidget {
         child: Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            // Ícono
             Container(
               width: 40, height: 40,
               decoration: BoxDecoration(
@@ -69,7 +68,6 @@ class NotificacionCard extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.s3),
 
-            // Contenido
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -126,7 +124,6 @@ class NotificacionCard extends StatelessWidget {
               ),
             ),
 
-            // Menú
             const Icon(Icons.more_vert,
                 color: AppColors.gray400, size: 18),
           ],

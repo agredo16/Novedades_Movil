@@ -6,7 +6,6 @@ class AppTypography {
 
   static const String fontFamily = 'Roboto';
 
-  // Tailwind-like text sizes
   static const TextStyle xs = TextStyle(
     fontSize: 12, color: AppColors.gray500);
 

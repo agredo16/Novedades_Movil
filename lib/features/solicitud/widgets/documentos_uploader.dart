@@ -19,7 +19,6 @@ class DocumentosUploader extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        // Zona de drop
         GestureDetector(
           onTap: onAgregar,
           child: Container(

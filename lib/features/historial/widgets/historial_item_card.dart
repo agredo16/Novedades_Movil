@@ -31,7 +31,6 @@ class HistorialItemCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          // Ícono
           Container(
             width: 40, height: 40,
             decoration: BoxDecoration(
@@ -42,7 +41,6 @@ class HistorialItemCard extends StatelessWidget {
           ),
           const SizedBox(width: AppSpacing.s3),
 
-          // Contenido
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -69,7 +67,6 @@ class HistorialItemCard extends StatelessWidget {
             ),
           ),
 
-          // Status + flecha
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [

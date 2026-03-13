@@ -26,10 +26,10 @@ enum TipoSolicitud {
 extension TipoSolicitudExt on TipoSolicitud {
   String get label {
     switch (this) {
-      case TipoSolicitud.cambioCurso:    return 'Cambio de Curso';
-      case TipoSolicitud.cambioJornada:  return 'Cambio de Jornada';
-      case TipoSolicitud.cursoDirigido:  return 'Curso Dirigido';
-      case TipoSolicitud.adicionCurso:   return 'Adición de Curso';
+      case TipoSolicitud.cambioCurso:   return 'Cambio de Curso';
+      case TipoSolicitud.cambioJornada: return 'Cambio de Jornada';
+      case TipoSolicitud.cursoDirigido: return 'Curso Dirigido';
+      case TipoSolicitud.adicionCurso:  return 'Adición de Curso';
     }
   }
 
@@ -52,6 +52,15 @@ extension TipoSolicitudExt on TipoSolicitud {
       case TipoSolicitud.cambioJornada: return 'schedule';
       case TipoSolicitud.cursoDirigido: return 'menu_book';
       case TipoSolicitud.adicionCurso:  return 'add_circle_outline';
+    }
+  }
+
+  String get apiValue {
+    switch (this) {
+      case TipoSolicitud.cambioCurso:   return 'cambio_curso';
+      case TipoSolicitud.cambioJornada: return 'cambio_jornada';
+      case TipoSolicitud.cursoDirigido: return 'curso_dirigido';
+      case TipoSolicitud.adicionCurso:  return 'adicion_curso';
     }
   }
 }

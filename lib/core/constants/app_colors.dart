@@ -9,7 +9,6 @@ class AppColors {
   static const Color primaryLight = Color(0xFFBBDEFB);
   static const Color gray300 = Color(0xFFD1D5DB);
   static const Color gray600 = Color(0xFF4B5563);
-  // Grays (Tailwind gray)
   static const Color gray50  = Color(0xFFF9FAFB);
   static const Color gray100 = Color(0xFFF3F4F6);
   static const Color gray200 = Color(0xFFE5E7EB);

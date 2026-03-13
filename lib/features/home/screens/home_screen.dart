@@ -22,20 +22,19 @@ class HomeScreen extends ConsumerStatefulWidget {
 class _HomeScreenState extends ConsumerState<HomeScreen> {
   int _currentIndex = 0;
 
-  // ── Lista de pantallas del BottomNav ──────────────
- static const List<Widget> _screens = [
-  _HomeBody(),
-  NotificacionesScreen(),
-  HistorialScreen(),
-  PerfilScreen(),
-];
+  static const List<Widget> _screens = [
+    _HomeBody(),
+    NotificacionesScreen(),
+    HistorialScreen(),
+    PerfilScreen(),
+  ];
 
   @override
   Widget build(BuildContext context) {
+    final nombre = ref.watch(nombreUsuarioProvider);
+
     return Scaffold(
       backgroundColor: AppColors.bgPage,
-
-      // AppBar solo visible en Home (index 0)
       appBar: _currentIndex == 0 ? AppBar(
         backgroundColor: AppColors.white,
         elevation: 0,
@@ -62,14 +61,20 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
             child: CircleAvatar(
               radius: 18,
               backgroundColor: AppColors.primaryLight,
-              child: const Icon(Icons.person,
-                  color: AppColors.primary, size: 20),
+              child: Text(
+                nombre.isNotEmpty
+                    ? nombre.substring(0, 1).toUpperCase()
+                    : 'E',
+                style: AppTypography.sm.copyWith(
+                  color: AppColors.primary,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
           ),
         ],
       ) : null,
 
-      // Cambia el body según el tab activo
       body: _screens[_currentIndex],
 
       bottomNavigationBar: AppBottomNavBar(
@@ -80,14 +85,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
-// ── Body del Home separado como widget privado ────────
 class _HomeBody extends ConsumerWidget {
   const _HomeBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stats = ref.watch(statsProvider);
+    final stats      = ref.watch(statsProvider);
     final solicitudes = ref.watch(solicitudesRecientesProvider);
+    final nombre     = ref.watch(nombreUsuarioProvider);
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.s4),
@@ -95,11 +100,10 @@ class _HomeBody extends ConsumerWidget {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
 
-          // ── Saludo ────────────────────────────────
           const SizedBox(height: AppSpacing.s2),
           Row(
             children: [
-              Text('Hola, Carlos ', style: AppTypography.xl),
+              Text('Hola, $nombre ', style: AppTypography.xl),
               const Text('👋', style: TextStyle(fontSize: 20)),
             ],
           ),
@@ -109,7 +113,6 @@ class _HomeBody extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.s4),
 
-          // ── Stats ──────────────────────────────────
           Row(
             children: [
               StatsCard(
@@ -135,7 +138,6 @@ class _HomeBody extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.s4),
 
-          // ── Banner Nueva Solicitud ─────────────────
           Container(
             width: double.infinity,
             padding: const EdgeInsets.all(AppSpacing.s4),
@@ -192,8 +194,7 @@ class _HomeBody extends ConsumerWidget {
                   width: 40, height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(
-                        AppSpacing.radiusFull),
+                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
                   ),
                   child: const Icon(Icons.add,
                       color: AppColors.white, size: 24),
@@ -204,7 +205,6 @@ class _HomeBody extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.s5),
 
-          // ── Resumen Reciente ───────────────────────
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
@@ -226,7 +226,6 @@ class _HomeBody extends ConsumerWidget {
 
           const SizedBox(height: AppSpacing.s4),
 
-          // ── Recordatorio ───────────────────────────
           Container(
             padding: const EdgeInsets.all(AppSpacing.s4),
             decoration: BoxDecoration(

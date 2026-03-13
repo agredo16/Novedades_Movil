@@ -1,7 +1,6 @@
 class AppSpacing {
   AppSpacing._();
 
-  // Tailwind-like spacing scale
   static const double s1  = 4.0;
   static const double s2  = 8.0;
   static const double s3  = 12.0;
@@ -13,7 +12,6 @@ class AppSpacing {
   static const double s12 = 48.0;
   static const double s16 = 64.0;
 
-  // Border radius
   static const double radiusSm  = 8.0;
   static const double radiusMd  = 12.0;
   static const double radiusLg  = 16.0;

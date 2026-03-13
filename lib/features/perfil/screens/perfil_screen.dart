@@ -31,7 +31,6 @@ class PerfilScreen extends ConsumerWidget {
           children: [
             const SizedBox(height: AppSpacing.s4),
 
-            // ── Avatar ───────────────────────────────────
             CircleAvatar(
               radius: 48,
               backgroundColor: AppColors.primaryLight,
@@ -59,7 +58,6 @@ class PerfilScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.s6),
 
-            // ── Opciones ─────────────────────────────────
             _buildOpcion(
               icon: Icons.person_outline,
               label: 'Información Personal',
@@ -85,7 +83,6 @@ class PerfilScreen extends ConsumerWidget {
               textColor: textColor,
             ),
 
-            // ── Toggle Tema Oscuro ────────────────────────
             Container(
               margin: const EdgeInsets.only(bottom: AppSpacing.s2),
               decoration: BoxDecoration(
@@ -130,7 +127,6 @@ class PerfilScreen extends ConsumerWidget {
 
             const SizedBox(height: AppSpacing.s4),
 
-            // ── Cerrar Sesión ─────────────────────────────
             SizedBox(
               width: double.infinity,
               height: 52,

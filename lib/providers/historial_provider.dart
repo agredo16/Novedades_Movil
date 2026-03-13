@@ -39,7 +39,6 @@ final historialProvider = Provider<List<SolicitudModel>>((ref) => const [
   ),
 ]);
 
-// Filtro activo
 enum FiltroHistorial { todos, pendientes, aprobados, rechazados }
 
 final filtroHistorialProvider = StateProvider<FiltroHistorial>(

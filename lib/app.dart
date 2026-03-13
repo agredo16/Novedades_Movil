@@ -16,7 +16,7 @@ class AcademiaApp extends ConsumerWidget {
       debugShowCheckedModeBanner: false,
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
-      themeMode: themeMode,         // ← cambia entre light/dark
+      themeMode: themeMode,        
       routerConfig: AppRouter.router,
     );
   }

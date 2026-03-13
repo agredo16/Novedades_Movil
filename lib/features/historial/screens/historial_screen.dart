@@ -31,7 +31,6 @@ class HistorialScreen extends ConsumerWidget {
 
       body: Column(
         children: [
-          // ── Buscador ───────────────────────────────────
           Container(
             color: AppColors.white,
             padding: const EdgeInsets.fromLTRB(
@@ -49,7 +48,6 @@ class HistorialScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Filtros ────────────────────────────────────
           Container(
             color: AppColors.white,
             padding: const EdgeInsets.fromLTRB(
@@ -98,7 +96,6 @@ class HistorialScreen extends ConsumerWidget {
             ),
           ),
 
-          // ── Lista ──────────────────────────────────────
           Expanded(
             child: ListView.builder(
               padding: const EdgeInsets.all(AppSpacing.s4),
