@@ -5,6 +5,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../providers/home_provider.dart';
+import '../../../providers/historial_provider.dart';
 import '../../shared/bottom_nav_bar.dart';
 import '../../notificaciones/screens/notificaciones_screen.dart';
 import '../../historial/screens/historial_screen.dart';
@@ -34,9 +35,9 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
     final nombre = ref.watch(nombreUsuarioProvider);
 
     return Scaffold(
-      backgroundColor: AppColors.bgPage,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       appBar: _currentIndex == 0 ? AppBar(
-        backgroundColor: AppColors.white,
+        backgroundColor: Theme.of(context).appBarTheme.backgroundColor,
         elevation: 0,
         title: Row(
           children: [
@@ -85,14 +86,17 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   }
 }
 
+// ── Body del Home ─────────────────────────────────────
 class _HomeBody extends ConsumerWidget {
   const _HomeBody();
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final stats      = ref.watch(statsProvider);
-    final solicitudes = ref.watch(solicitudesRecientesProvider);
-    final nombre     = ref.watch(nombreUsuarioProvider);
+    final stats                = ref.watch(statsProvider);
+    final solicitudes          = ref.watch(solicitudesRecientesProvider);      // ← SolicitudModel para el card
+    final solicitudesHistorial = ref.watch(solicitudesRecientesHistorialProvider); // ← HistorialModel para el modal
+    final nombre               = ref.watch(nombreUsuarioProvider);
+    final isLoading            = ref.watch(historialProvider).isLoading;
 
     return SingleChildScrollView(
       padding: const EdgeInsets.all(AppSpacing.s4),
@@ -194,7 +198,8 @@ class _HomeBody extends ConsumerWidget {
                   width: 40, height: 40,
                   decoration: BoxDecoration(
                     color: AppColors.white.withOpacity(0.2),
-                    borderRadius: BorderRadius.circular(AppSpacing.radiusFull),
+                    borderRadius: BorderRadius.circular(
+                        AppSpacing.radiusFull),
                   ),
                   child: const Icon(Icons.add,
                       color: AppColors.white, size: 24),
@@ -217,12 +222,38 @@ class _HomeBody extends ConsumerWidget {
           ),
           const SizedBox(height: AppSpacing.s2),
 
-          ...solicitudes.asMap().entries.map((entry) =>
-            SolicitudItemCard(
-              solicitud: entry.value,
-              isHighlighted: entry.key == 1,
+          if (isLoading)
+            ...List.generate(3, (_) => const _SkeletonCard())
+          else if (solicitudes.isEmpty)
+            Container(
+              padding: const EdgeInsets.all(AppSpacing.s5),
+              decoration: BoxDecoration(
+                color: AppColors.white,
+                borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+                border: Border.all(color: AppColors.gray100),
+              ),
+              child: Center(
+                child: Column(
+                  children: [
+                    const Icon(Icons.inbox_outlined,
+                        color: AppColors.gray300, size: 36),
+                    const SizedBox(height: AppSpacing.s2),
+                    Text('No tienes solicitudes recientes',
+                        style: AppTypography.smGray),
+                  ],
+                ),
+              ),
+            )
+          else
+            ...solicitudes.asMap().entries.map((entry) =>
+              SolicitudItemCard(
+                solicitud: entry.value,          // ← SolicitudModel ✅
+                isHighlighted: entry.key == 0,
+                historialModel: entry.key < solicitudesHistorial.length
+                    ? solicitudesHistorial[entry.key]  // ← HistorialModel para el modal ✅
+                    : null,
+              ),
             ),
-          ),
 
           const SizedBox(height: AppSpacing.s4),
 
@@ -251,6 +282,57 @@ class _HomeBody extends ConsumerWidget {
           ),
 
           const SizedBox(height: AppSpacing.s6),
+        ],
+      ),
+    );
+  }
+}
+
+class _SkeletonCard extends StatelessWidget {
+  const _SkeletonCard();
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: AppSpacing.s2),
+      padding: const EdgeInsets.all(AppSpacing.s3),
+      decoration: BoxDecoration(
+        color: AppColors.white,
+        borderRadius: BorderRadius.circular(AppSpacing.radiusMd),
+        border: Border.all(color: AppColors.gray100),
+      ),
+      child: Row(
+        children: [
+          Container(
+            width: 36, height: 36,
+            decoration: BoxDecoration(
+              color: AppColors.gray100,
+              borderRadius: BorderRadius.circular(AppSpacing.radiusSm),
+            ),
+          ),
+          const SizedBox(width: AppSpacing.s3),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Container(
+                  height: 12, width: 140,
+                  decoration: BoxDecoration(
+                    color: AppColors.gray100,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+                const SizedBox(height: 6),
+                Container(
+                  height: 10, width: 100,
+                  decoration: BoxDecoration(
+                    color: AppColors.gray100,
+                    borderRadius: BorderRadius.circular(4),
+                  ),
+                ),
+              ],
+            ),
+          ),
         ],
       ),
     );

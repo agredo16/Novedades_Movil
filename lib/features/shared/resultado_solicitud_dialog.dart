@@ -4,6 +4,7 @@ import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../data/models/solicitud_request_model.dart';
 
+// ── Dialog de ÉXITO ──────────────────────────────────
 class ExitoSolicitudDialog extends StatefulWidget {
   final SolicitudResponseModel respuesta;
   final VoidCallback onIrInicio;
@@ -247,16 +248,21 @@ class _ExitoSolicitudDialogState extends State<ExitoSolicitudDialog>
   }
 }
 
+// ── Dialog de ERROR ──────────────────────────────────
 class ErrorSolicitudDialog extends StatelessWidget {
   final String mensaje;
   final VoidCallback onIntentar;
   final VoidCallback onCancelar;
+  final String? labelIntentar;   // ← opcional
+  final String? labelCancelar;   // ← opcional
 
   const ErrorSolicitudDialog({
     super.key,
     required this.mensaje,
     required this.onIntentar,
     required this.onCancelar,
+    this.labelIntentar,          // ← opcional
+    this.labelCancelar,          // ← opcional
   });
 
   @override
@@ -335,9 +341,11 @@ class ErrorSolicitudDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.s3),
                     ),
-                    child: Text('Cancelar',
-                        style: AppTypography.sm.copyWith(
-                            color: AppColors.gray600)),
+                    child: Text(
+                      labelCancelar ?? 'Cancelar',  // ← usa label o default
+                      style: AppTypography.sm.copyWith(
+                          color: AppColors.gray600),
+                    ),
                   ),
                 ),
                 const SizedBox(width: AppSpacing.s3),
@@ -353,9 +361,11 @@ class ErrorSolicitudDialog extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(
                           vertical: AppSpacing.s3),
                     ),
-                    child: Text('Reintentar',
-                        style: AppTypography.sm.copyWith(
-                            color: AppColors.white)),
+                    child: Text(
+                      labelIntentar ?? 'Reintentar',  // ← usa label o default
+                      style: AppTypography.sm.copyWith(
+                          color: AppColors.white),
+                    ),
                   ),
                 ),
               ],

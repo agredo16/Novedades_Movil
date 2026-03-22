@@ -49,7 +49,6 @@ class AuthNotifier extends StateNotifier<AuthState> {
     required String password,
   }) async {
     state = state.copyWith(isLoading: true, error: null);
-
     try {
       final user = await _repo.login(
         codigoEstudiantil: codigo,
@@ -58,20 +57,48 @@ class AuthNotifier extends StateNotifier<AuthState> {
       state = state.copyWith(
         user:            user,
         isLoading:       false,
-        isAuthenticated: true,   
+        isAuthenticated: true,
         error:           null,
       );
-    }  catch (e) {
-  state = state.copyWith(
-    isLoading:       false,
-    isAuthenticated: false,
-    user:            null,
-    error:           e.toString()
-        .replaceAll('Exception: ', '')
-        .replaceAll('DioException', '')
-        .trim(),
-  );
-}
+    } catch (e) {
+      state = state.copyWith(
+        isLoading:       false,
+        isAuthenticated: false,
+        user:            null,
+        error:           e.toString()
+            .replaceAll('Exception: ', '')
+            .replaceAll('DioException', '')
+            .trim(),
+      );
+    }
+  }
+
+  // ── Cambiar contraseña primer login ───────────────
+  Future<bool> cambiarPassword({
+    required String passwordActual,
+    required String passwordNueva,
+  }) async {
+    state = state.copyWith(isLoading: true, error: null);
+    try {
+      await _repo.cambiarPassword(
+        passwordActual: passwordActual,
+        passwordNueva:  passwordNueva,
+      );
+      state = state.copyWith(
+        isLoading: false,
+        error:     null,
+      );
+      return true;
+    } catch (e) {
+      state = state.copyWith(
+        isLoading: false,
+        error:     e.toString()
+            .replaceAll('Exception: ', '')
+            .replaceAll('DioException', '')
+            .trim(),
+      );
+      return false;
+    }
   }
 
   Future<void> logout() async {

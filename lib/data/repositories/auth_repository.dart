@@ -53,4 +53,35 @@ class AuthRepository {
     final token = await _storage.read(key: 'auth_token');
     return token != null && token.isNotEmpty;
   }
+
+  Future<String> cambiarPassword({
+  required String passwordActual,
+  required String passwordNueva,
+}) async {
+  try {
+    final response = await ApiService.post('/auth/change-password', {
+      'password_actual': passwordActual,
+      'password_nueva':  passwordNueva,
+    });
+
+    final data = response.data;
+
+    if (data['ok'] == true) {
+      // ✅ Guarda el nuevo token
+      final nuevoToken = data['datos']['token'];
+      await _storage.write(key: 'auth_token', value: nuevoToken);
+      return nuevoToken;
+    } else {
+      throw Exception(data['mensaje'] ?? 'Error al cambiar contraseña');
+    }
+
+  } on DioException catch (e) {
+    if (e.response?.data != null) {
+      throw Exception(e.response?.data['mensaje'] ?? 'Error del servidor');
+    }
+    throw Exception('No se pudo conectar al servidor');
+  } catch (e) {
+    throw Exception(e.toString().replaceAll('Exception: ', ''));
+  }
+}
 }

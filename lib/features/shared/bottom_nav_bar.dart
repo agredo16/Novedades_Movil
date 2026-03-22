@@ -17,13 +17,15 @@ class AppBottomNavBar extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final noLeidas = ref.watch(noLeidasCountProvider);
 
+    final bottomTheme = Theme.of(context).bottomNavigationBarTheme;
+
     return BottomNavigationBar(
       currentIndex: currentIndex,
       onTap: onTap,
       type: BottomNavigationBarType.fixed,
-      backgroundColor: AppColors.white,
-      selectedItemColor: AppColors.primary,
-      unselectedItemColor: AppColors.gray400,
+      backgroundColor: bottomTheme.backgroundColor ?? Theme.of(context).canvasColor,
+      selectedItemColor: bottomTheme.selectedItemColor ?? Theme.of(context).colorScheme.primary,
+      unselectedItemColor: bottomTheme.unselectedItemColor ?? Theme.of(context).disabledColor,
       selectedFontSize: 11,
       unselectedFontSize: 11,
       elevation: 8,

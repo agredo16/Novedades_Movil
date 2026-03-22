@@ -8,9 +8,11 @@ import '../../../core/constants/app_typography.dart';
 import '../../../data/models/solicitud_model.dart';
 import '../../../data/models/solicitud_request_model.dart';
 import '../../../providers/solicitud_provider.dart';
+import '../../../providers/grupo_provider.dart';
 import '../widgets/step_indicator.dart';
 import '../widgets/tipo_solicitud_grid.dart';
 import '../widgets/documentos_uploader.dart';
+import '../widgets/grupo_selector.dart';
 
 class NuevaSolicitudScreen extends ConsumerStatefulWidget {
   const NuevaSolicitudScreen({super.key});
@@ -22,52 +24,49 @@ class NuevaSolicitudScreen extends ConsumerStatefulWidget {
 
 class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
   final _justificacionController = TextEditingController();
-  final _grupoIdController       = TextEditingController();
 
   @override
   void dispose() {
     _justificacionController.dispose();
-    _grupoIdController.dispose();
     super.dispose();
   }
 
- Future<void> _enviar() async {
-  final notifier = ref.read(nuevaSolicitudProvider.notifier);
-  final exito    = await notifier.enviarSolicitud();
+  Future<void> _enviar() async {
+    final notifier = ref.read(nuevaSolicitudProvider.notifier);
+    final exito    = await notifier.enviarSolicitud();
 
-  if (!mounted) return;
+    if (!mounted) return;
 
-  if (exito) {
-    final respuesta = ref.read(nuevaSolicitudProvider).respuesta!;
-    showDialog(
-      context: context,
-      barrierDismissible: false,
-      builder: (_) => ExitoSolicitudDialog(
-        respuesta: respuesta,
-        onIrInicio: () {
-          Navigator.pop(context);
-          ref.read(nuevaSolicitudProvider.notifier).reset();
-          context.go('/home');
-        },
-      ),
-    );
-  } else {
-    final error = ref.read(nuevaSolicitudProvider).error ?? 
-                  'Error al procesar la solicitud';
-    showDialog(
-      context: context,
-      builder: (_) => ErrorSolicitudDialog(
-        mensaje: error,
-        onIntentar: () => Navigator.pop(context),
-        onCancelar: () {
-          Navigator.pop(context);
-          context.go('/home');
-        },
-      ),
-    );
+    if (exito) {
+      final respuesta = ref.read(nuevaSolicitudProvider).respuesta!;
+      showDialog(
+        context: context,
+        barrierDismissible: false,
+        builder: (_) => ExitoSolicitudDialog(
+          respuesta: respuesta,
+          onIrInicio: () {
+            Navigator.pop(context);
+            ref.read(nuevaSolicitudProvider.notifier).reset();
+            context.go('/home');
+          },
+        ),
+      );
+    } else {
+      final error = ref.read(nuevaSolicitudProvider).error ??
+                    'Error al procesar la solicitud';
+      showDialog(
+        context: context,
+        builder: (_) => ErrorSolicitudDialog(
+          mensaje: error,
+          onIntentar: () => Navigator.pop(context),
+          onCancelar: () {
+            Navigator.pop(context);
+            context.go('/home');
+          },
+        ),
+      );
+    }
   }
-}
-
 
   bool _puedeEnviar(NuevaSolicitudState state) {
     if (state.isLoading) return false;
@@ -91,8 +90,9 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final state    = ref.watch(nuevaSolicitudProvider);
-    final notifier = ref.read(nuevaSolicitudProvider.notifier);
+    final state     = ref.watch(nuevaSolicitudProvider);
+    final notifier  = ref.read(nuevaSolicitudProvider.notifier);
+    final grupoState = ref.watch(grupoProvider);
 
     return Scaffold(
       backgroundColor: AppColors.bgPage,
@@ -113,9 +113,11 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
 
+            // ── Step Indicator ───────────────────────
             StepIndicator(totalSteps: 3, currentStep: 0),
             const SizedBox(height: AppSpacing.s4),
 
+            // ── Info banner ──────────────────────────
             Container(
               padding: const EdgeInsets.all(AppSpacing.s3),
               decoration: BoxDecoration(
@@ -142,6 +144,7 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
 
             const SizedBox(height: AppSpacing.s5),
 
+            // ── Tipo de Solicitud ────────────────────
             Row(children: [
               const Icon(Icons.grid_view_rounded,
                   color: AppColors.primary, size: 18),
@@ -156,6 +159,7 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
 
             const SizedBox(height: AppSpacing.s5),
 
+            // ── Campos dinámicos ─────────────────────
             if (state.tipoSeleccionado != null) ...[
               Row(children: [
                 const Icon(Icons.description_outlined,
@@ -166,6 +170,7 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
               ]),
               const SizedBox(height: AppSpacing.s3),
 
+              // ── Cambio de Jornada ──────────────────
               if (state.tipoSeleccionado == TipoSolicitud.cambioJornada) ...[
                 _buildLabel('Jornada Actual *'),
                 const SizedBox(height: AppSpacing.s2),
@@ -189,24 +194,22 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
                 const SizedBox(height: AppSpacing.s3),
               ],
 
+              // ── Selector de grupos ─────────────────
               if (state.tipoSeleccionado == TipoSolicitud.adicionCurso ||
                   state.tipoSeleccionado == TipoSolicitud.cursoDirigido ||
                   state.tipoSeleccionado == TipoSolicitud.cambioCurso) ...[
-                _buildLabel('ID del Grupo *'),
+                _buildLabel('Selecciona el Grupo *'),
                 const SizedBox(height: AppSpacing.s2),
-                TextField(
-                  controller: _grupoIdController,
-                  keyboardType: TextInputType.number,
-                  onChanged: (v) {
-                    final id = int.tryParse(v);
-                    if (id != null) notifier.setGrupoNuevoId(id);
-                  },
-                  decoration: const InputDecoration(
-                      hintText: 'Ej: 3'),
+                GrupoSelector(
+                  grupos:              grupoState.grupos,
+                  grupoSeleccionadoId: state.grupoNuevoId,
+                  isLoading:           grupoState.isLoading,
+                  onSelect: (grupo) => notifier.setGrupoNuevoId(grupo.id),
                 ),
                 const SizedBox(height: AppSpacing.s3),
               ],
 
+              // ── Justificación siempre visible ──────
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
@@ -222,14 +225,14 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
                 onChanged: notifier.setJustificacion,
                 maxLines: 4,
                 decoration: const InputDecoration(
-                  hintText:
-                      'Explica los motivos académicos o laborales...',
+                  hintText: 'Explica los motivos académicos o laborales...',
                   alignLabelWithHint: true,
                 ),
               ),
 
               const SizedBox(height: AppSpacing.s5),
 
+              // ── Documentos solo para Adición ───────
               if (state.tipoSeleccionado == TipoSolicitud.adicionCurso) ...[
                 Row(children: [
                   const Icon(Icons.attach_file_rounded,
@@ -253,6 +256,7 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
               ],
             ],
 
+            // ── Botón Enviar ─────────────────────────
             SizedBox(
               width: double.infinity,
               height: 52,

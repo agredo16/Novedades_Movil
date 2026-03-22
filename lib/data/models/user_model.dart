@@ -23,7 +23,7 @@ class UserModel {
       idUsuario:          json['id_usuario'],
       nombreCompleto:     json['nombre_completo'],
       rol:                json['rol'],
-      primerLogin:        json['primer_login'],
+      primerLogin:        json['primer_login'] ?? false,
       codigoEstudiantil:  json['codigo_estudiantil'],
       expiraEn:           json['expira_en'],
     );

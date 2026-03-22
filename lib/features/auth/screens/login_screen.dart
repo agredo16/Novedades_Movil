@@ -49,7 +49,11 @@ class _LoginScreenState extends ConsumerState<LoginScreen> {
   final authState = ref.read(authProvider);
 
   if (authState.isAuthenticated && authState.user != null) {
-    context.go('/home');
+    if (authState.user!.primerLogin) {
+      context.go('/cambiar-password'); 
+    } else {
+      context.go('/home');         
+    }
   } else if (authState.error != null) {
     showDialog(
       context: context,
