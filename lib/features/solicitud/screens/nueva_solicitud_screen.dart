@@ -6,13 +6,13 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_spacing.dart';
 import '../../../core/constants/app_typography.dart';
 import '../../../data/models/solicitud_model.dart';
-import '../../../data/models/solicitud_request_model.dart';
+
 import '../../../providers/solicitud_provider.dart';
 import '../../../providers/grupo_provider.dart';
 import '../widgets/step_indicator.dart';
 import '../widgets/tipo_solicitud_grid.dart';
 import '../widgets/documentos_uploader.dart';
-import '../widgets/grupo_selector.dart';
+import '../widgets/grupo_buscador.dart';
 
 class NuevaSolicitudScreen extends ConsumerStatefulWidget {
   const NuevaSolicitudScreen({super.key});
@@ -69,24 +69,26 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
   }
 
   bool _puedeEnviar(NuevaSolicitudState state) {
-    if (state.isLoading) return false;
-    if (state.tipoSeleccionado == null) return false;
-    if (state.justificacion.length < 50) return false;
+  if (state.isLoading) return false;
+  if (state.tipoSeleccionado == null) return false;
+  if (state.justificacion.length < 50) return false;
 
-    if (state.tipoSeleccionado == TipoSolicitud.cambioJornada) {
-      if (state.jornadaActual == null || state.jornadaNueva == null) {
-        return false;
-      }
-    }
-
-    if (state.tipoSeleccionado == TipoSolicitud.adicionCurso ||
-        state.tipoSeleccionado == TipoSolicitud.cursoDirigido ||
-        state.tipoSeleccionado == TipoSolicitud.cambioCurso) {
-      if (state.grupoNuevoId == null) return false;
-    }
-
-    return true;
+  if (state.tipoSeleccionado == TipoSolicitud.cambioJornada) {
+    if (state.jornadaActual == null || state.jornadaNueva == null) return false;
   }
+
+  // Cambio de curso necesita grupo actual Y grupo nuevo
+  if (state.tipoSeleccionado == TipoSolicitud.cambioCurso) {
+    if (state.grupoActualId == null || state.grupoNuevoId == null) return false;
+  }
+
+  if (state.tipoSeleccionado == TipoSolicitud.adicionCurso ||
+      state.tipoSeleccionado == TipoSolicitud.cursoDirigido) {
+    if (state.grupoNuevoId == null) return false;
+  }
+
+  return true;
+}
 
   @override
   Widget build(BuildContext context) {
@@ -194,16 +196,34 @@ class _NuevaSolicitudScreenState extends ConsumerState<NuevaSolicitudScreen> {
                 const SizedBox(height: AppSpacing.s3),
               ],
 
-              // ── Selector de grupos ─────────────────
-              if (state.tipoSeleccionado == TipoSolicitud.adicionCurso ||
-                  state.tipoSeleccionado == TipoSolicitud.cursoDirigido ||
-                  state.tipoSeleccionado == TipoSolicitud.cambioCurso) ...[
-                _buildLabel('Selecciona el Grupo *'),
-                const SizedBox(height: AppSpacing.s2),
-                GrupoSelector(
+              // ── Cambio de Curso — 2 buscadores ────────────────
+              if (state.tipoSeleccionado == TipoSolicitud.cambioCurso) ...[
+                GrupoBuscador(
                   grupos:              grupoState.grupos,
+                  label:               'Grupo Actual *',
+                  hint:                'Busca por nombre o código del curso actual',
+                  grupoSeleccionadoId: state.grupoActualId,
+                  onSelect: (grupo) => notifier.setGrupoActualId(grupo.id),
+                ),
+                const SizedBox(height: AppSpacing.s4),
+                GrupoBuscador(
+                  grupos:              grupoState.grupos,
+                  label:               'Grupo Nuevo *',
+                  hint:                'Busca por nombre o código del grupo destino',
                   grupoSeleccionadoId: state.grupoNuevoId,
-                  isLoading:           grupoState.isLoading,
+                  onSelect: (grupo) => notifier.setGrupoNuevoId(grupo.id),
+                ),
+                const SizedBox(height: AppSpacing.s3),
+              ],
+
+              // ── Adición / Curso Dirigido — 1 buscador ─────────
+              if (state.tipoSeleccionado == TipoSolicitud.adicionCurso ||
+                  state.tipoSeleccionado == TipoSolicitud.cursoDirigido) ...[
+                GrupoBuscador(
+                  grupos:              grupoState.grupos,
+                  label:               'Selecciona el Grupo *',
+                  hint:                'Busca por nombre o código del curso',
+                  grupoSeleccionadoId: state.grupoNuevoId,
                   onSelect: (grupo) => notifier.setGrupoNuevoId(grupo.id),
                 ),
                 const SizedBox(height: AppSpacing.s3),

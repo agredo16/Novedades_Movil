@@ -3,6 +3,7 @@ class SolicitudRequestModel {
   final String justificacion;
   final String periodoAcademico;
   final int? grupoNuevoId;
+  final int? grupoActualId;
   final String? jornadaActual;
   final String? jornadaNueva;
   final String? adjuntoBase64;
@@ -13,6 +14,7 @@ class SolicitudRequestModel {
     required this.justificacion,
     required this.periodoAcademico,
     this.grupoNuevoId,
+     this.grupoActualId,
     this.jornadaActual,
     this.jornadaNueva,
     this.adjuntoBase64,
@@ -26,6 +28,7 @@ class SolicitudRequestModel {
       'periodo_academico': periodoAcademico,
     };
     if (grupoNuevoId != null)  json['grupo_nuevo_id']  = grupoNuevoId;
+    if (grupoActualId != null) json['grupo_actual_id']  = grupoActualId;
     if (jornadaActual != null) json['jornada_actual']   = jornadaActual;
     if (jornadaNueva != null)  json['jornada_nueva']    = jornadaNueva;
     if (adjuntoBase64 != null) json['adjunto_base64']   = adjuntoBase64;

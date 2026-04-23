@@ -9,6 +9,7 @@ class NuevaSolicitudState {
   final String justificacion;
   final String periodoAcademico;
   final int? grupoNuevoId;
+  final int? grupoActualId;
   final String? jornadaActual;
   final String? jornadaNueva;
   final List<String> archivos;
@@ -22,6 +23,7 @@ class NuevaSolicitudState {
     this.justificacion    = '',
     this.periodoAcademico = '2026-1',
     this.grupoNuevoId,
+     this.grupoActualId,
     this.jornadaActual,
     this.jornadaNueva,
     this.archivos         = const [],
@@ -36,6 +38,7 @@ class NuevaSolicitudState {
     String? justificacion,
     String? periodoAcademico,
     int? grupoNuevoId,
+    int? grupoActualId,
     String? jornadaActual,
     String? jornadaNueva,
     List<String>? archivos,
@@ -49,6 +52,7 @@ class NuevaSolicitudState {
       justificacion:    justificacion     ?? this.justificacion,
       periodoAcademico: periodoAcademico  ?? this.periodoAcademico,
       grupoNuevoId:     grupoNuevoId      ?? this.grupoNuevoId,
+      grupoActualId:    grupoActualId     ?? this.grupoActualId,
       jornadaActual:    jornadaActual     ?? this.jornadaActual,
       jornadaNueva:     jornadaNueva      ?? this.jornadaNueva,
       archivos:         archivos          ?? this.archivos,
@@ -63,6 +67,8 @@ class NuevaSolicitudNotifier extends StateNotifier<NuevaSolicitudState> {
   final SolicitudRepository _repo;
 
   NuevaSolicitudNotifier(this._repo) : super(const NuevaSolicitudState());
+  void setGrupoActualId(int id) =>
+    state = state.copyWith(grupoActualId: id);
 
   void seleccionarTipo(TipoSolicitud tipo) =>
       state = state.copyWith(tipoSeleccionado: tipo);
@@ -86,6 +92,7 @@ class NuevaSolicitudNotifier extends StateNotifier<NuevaSolicitudState> {
       state = state.copyWith(
         archivos: state.archivos.where((a) => a != nombre).toList());
 
+
   Future<bool> enviarSolicitud() async {
     if (state.tipoSeleccionado == null) return false;
 
@@ -97,6 +104,7 @@ class NuevaSolicitudNotifier extends StateNotifier<NuevaSolicitudState> {
         justificacion:    state.justificacion,
         periodoAcademico: state.periodoAcademico,
         grupoNuevoId:     state.grupoNuevoId,
+        grupoActualId:    state.grupoActualId,
         jornadaActual:    state.jornadaActual,
         jornadaNueva:     state.jornadaNueva,
       );
